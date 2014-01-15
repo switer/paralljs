@@ -30,7 +30,21 @@ function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
         },
         // state change listener
         change: function (/*[stateName], [listener]*/) {
-            
+
+            var args = util.slice(arguments),
+                stateName = util.type(args[0]) == 'string' ? args[0]: null,
+                listener = util.type(args[0]) == 'function' ? args[0]: args[1];
+
+            if (util.type(listener) != 'function') {
+                throw new Error('Illegal state listener!');
+            }
+            if (stateName) {
+                stateListeners[stateName] = stateListeners[stateName] || [];
+                stateListeners[stateName].push(listener);
+            } else {
+                globalStateListeners.push(listener);
+            }
+
         },
         before: function () {
             
@@ -115,6 +129,19 @@ var util = {
         } catch (e) {
             
         }
+    },
+    /**
+     *  Get a object type
+     **/
+    type: function (obj) {
+        var type;
+        if (obj == null) {
+            type = String(obj);
+        } else {
+            type = Object.prototype.toString.call(obj).toLowerCase();
+            type = type.substring(8, type.length - 1);
+        }
+        return type;
     }
 }
 

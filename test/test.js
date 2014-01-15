@@ -1,4 +1,4 @@
-var Parall = require('paralljs');
+var Parall = require('../parall.js');
 
 Parall([
     // fetch from github.com
