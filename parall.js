@@ -109,6 +109,8 @@ function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
          *  change state
          **/
         state: function (stateName, stateValue) {
+            if (!stateName && !stateValue) return util.extend({}, states);
+
             // filter judge
             if (filter()) return parall;
 
@@ -136,7 +138,7 @@ function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
 
             util.each(beginParallHandlers, function (handler, index) {
                 // if (filter()) return true;
-                
+
                 // AOP before handler
                 util.batch.apply(util, [beforeHandlers, parall, index].concat(args));
                 // parall function invoke
