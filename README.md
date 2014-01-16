@@ -51,7 +51,7 @@ Instancing a parall intance and push parall functions with param which will be i
 Parall([func1, func2, func3], param);
 ```
 
-### .start(beginHandlers, [param1, param2, ..., paramN]);
+### .start();
 Start runing parall 
 ```javascript
 Parall([func1, func2, func3], param).start();
