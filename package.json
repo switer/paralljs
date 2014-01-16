@@ -1,0 +1,28 @@
+{
+  "name": "paralljs",
+  "version": "0.0.0",
+  "description": "Paralljs call each async function in parallel, let parallel async function callback fairily.",
+  "main": "parall.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test/test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/switer/paralljs.git"
+  },
+  "keywords": [
+    "parallel",
+    "parall",
+    "js",
+    "async",
+    "node"
+  ],
+  "author": "switer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/switer/paralljs/issues"
+  }
+}

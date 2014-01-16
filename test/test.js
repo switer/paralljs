@@ -4,19 +4,21 @@ Parall([
     // fetch from github.com
     function (parall, index, param) {
 
-        console.log(param); // "switer"
+        console.log(index, param); // 0 "switer"
 
-        parall.state({
-            'isFromGithub': true,
-            'isFromGithubIO': false
-        });
+        // parall.state({
+        //     'isFromGithub': true,
+        //     'isFromGithubIO': false
+        // });
     },
     // fetch from github.io
-    function (parall) {
+    function (parall, index) {
+         console.log(index); // 1
         parall.state('isFromGithubIO', true);
     },
     // fetch from github.com/switer
-    function (parall) {
+    function (parall, index) {
+         console.log(index); // 2
         parall.state('isFromGithubSwiter', true);
         // states well be never change
         parall.end();
@@ -27,13 +29,15 @@ Parall([
     
 })
 .change(function (parall, states) {
+    console.log('all', states)
     if(states.isFromGithub && states.isFromGithubSwiter) {
         
     }
 })
-.change('isFromGithub', function (parall, isFromGithub) {
-    
+.change('isFromGithubSwiter', function (parall, isFromGithubSwiter) {
+    console.log('isFromGithubSwiter', isFromGithubSwiter)
 })
 .done(function () {
     
-});
+})
+.start();

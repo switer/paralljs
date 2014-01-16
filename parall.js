@@ -15,20 +15,40 @@
  */
 function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
 
-    var args = util.slice(argument),
-        parallHandlers = args.sift(),
+    var args = util.slice(arguments),
+        parallHandlers = args.shift(),
         stateListeners = {},
-        globalStateListeners = [];
+        globalStateListeners = [],
+        states = {};
 
+    /**
+     *  trigger state change
+     **/
+    function onstatechange (stateName) {
+        // get state handlers
+        stateHandlers = stateListeners[stateName];
+            
+        // notify state change listener with statename
+        util.batch(stateHandlers, parall, states[stateName]);
+        // notify gloabl state change listener
+        util.batch(globalStateListeners, parall, util.extend({}, states));
+    }
+    /**
+     *  Parall instance
+     **/
     var parall = {
 
-        // add a parall handler to parall array
+        /**
+         *  add a parall handler to parall array
+         **/
         parall: function (parallHandler) {
 
             parallHandlers.push(parallHandler);
             return parall;
         },
-        // state change listener
+        /**
+         *  state change listener
+         **/
         change: function (/*[stateName], [listener]*/) {
 
             var args = util.slice(arguments),
@@ -38,30 +58,44 @@ function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
             if (util.type(listener) != 'function') {
                 throw new Error('Illegal state listener!');
             }
-            if (stateName) {
+            if (stateName) { // Listen by statename
+
                 stateListeners[stateName] = stateListeners[stateName] || [];
                 stateListeners[stateName].push(listener);
-            } else {
+
+            } else { // Listen all states change
+
                 globalStateListeners.push(listener);
             }
 
+            return parall;
+
         },
+        /**
+         *  Run before each parallel function
+         **/
         before: function () {
-            
+            return parall;
         },
         done: function () {
-            
+            return parall;
         },
         end: function () {
-            
+            return parall;
+        },
+        state: function (stateName, stateValue) {
+
+            states[stateName] = stateValue;
+            // trigger state change event
+            onstatechange(stateName);
+            return parall;
         },
         start: function () {
 
             util.each(parallHandlers, function (handler, index) {
-                util.invoke(handler, parall, [parall, index]);
+                util.invoke(handler, parall, [parall, index].concat(args));
             });
 
-            util.batch(parallHandlers, args.unshift(parall));
             return parall;
         }
     }
@@ -90,6 +124,23 @@ var util = {
                 iterator.call(context, obj[key], key);
             }
         }
+    },
+    /**
+     *  Object extend api
+     **/
+    extend: function (obj, extObj, isNotOverRide) {
+
+        this.each(extObj, function (value, key) {
+            if (extObj.hasOwnProperty(key)) {
+                if (isNotOverRide && obj.hasOwnProperty(key)) {
+                    return;
+                } else {
+                    obj[key] = value;
+                }
+            }
+        });
+
+        return obj;
     },
     /**
       *  invoke handlers in batch process
