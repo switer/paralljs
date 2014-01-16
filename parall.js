@@ -16,9 +16,13 @@
 function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
 
     var args = util.slice(arguments),
-        parallHandlers = args.shift(),
+        beginParallHandlers = args.shift(),
+        parallHandlers = [],
         stateListeners = {},
         globalStateListeners = [],
+        beforeHandlers = [],
+        doneHandlers = [],
+        isStoping = false,
         states = {};
 
     /**
@@ -27,12 +31,16 @@ function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
     function onstatechange (stateName) {
         // get state handlers
         stateHandlers = stateListeners[stateName];
-            
+        
         // notify state change listener with statename
         util.batch(stateHandlers, parall, states[stateName]);
         // notify gloabl state change listener
         util.batch(globalStateListeners, parall, util.extend({}, states));
     }
+    function filter () {
+        return isStoping;
+    }
+
     /**
      *  Parall instance
      **/
@@ -42,14 +50,22 @@ function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
          *  add a parall handler to parall array
          **/
         parall: function (parallHandler) {
+            var args = util.slice(arguments);
+            args.shift();
 
-            parallHandlers.push(parallHandler);
+            // with params
+            parallHandlers.push({
+                handler: parallHandler,
+                args: args
+            });
             return parall;
         },
         /**
          *  state change listener
          **/
         change: function (/*[stateName], [listener]*/) {
+            // filter judge
+            if (filter()) return parall;
 
             var args = util.slice(arguments),
                 stateName = util.type(args[0]) == 'string' ? args[0]: null,
@@ -74,26 +90,71 @@ function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
         /**
          *  Run before each parallel function
          **/
-        before: function () {
+        before: function (beforeHandler) {
+            beforeHandlers.push(beforeHandler);
             return parall;
         },
-        done: function () {
+        final: function (doneHandler) {
+            doneHandlers.push(doneHandler);
             return parall;
         },
         end: function () {
-            return parall;
-        },
-        state: function (stateName, stateValue) {
+            if (filter()) return;
+            isStoping = true;
 
-            states[stateName] = stateValue;
-            // trigger state change event
-            onstatechange(stateName);
+            util.batch(doneHandlers, parall);
             return parall;
         },
+        /**
+         *  change state
+         **/
+        state: function (stateName, stateValue) {
+            // filter judge
+            if (filter()) return parall;
+
+            if (util.type(stateName) == 'object') { // trigger in batch
+
+                util.each(stateName, function (svalue, sname) {
+                    states[sname] = svalue;
+                    // trigger state change event
+                    onstatechange(sname);
+                });
+            } else {
+
+                states[stateName] = stateValue;
+                // trigger state change event
+                onstatechange(stateName);
+            }
+            return parall;
+        },
+        /**
+         *  Starting the parall and it will invoke start handler
+         */
         start: function () {
 
-            util.each(parallHandlers, function (handler, index) {
-                util.invoke(handler, parall, [parall, index].concat(args));
+            var beginHandlerLength = beginParallHandlers.length;
+
+            util.each(beginParallHandlers, function (handler, index) {
+                // if (filter()) return true;
+                
+                // AOP before handler
+                util.batch.apply(util, [beforeHandlers, parall, index].concat(args));
+                // parall function invoke
+                handler.apply(parall, [parall, index].concat(args));
+            });
+            // I don't want to cancat parallHandlers with beginParallHandlers.
+            util.each(parallHandlers, function (handlerObj, index) {
+                // if (filter()) return true;
+
+                var handler = handlerObj.handler,
+                    args = handlerObj.args;
+                // plus with begin length
+                index += beginHandlerLength;
+
+                // AOP before handler
+                util.batch.apply(util, [beforeHandlers, parall, index].concat(args));
+                // parall function invoke
+                handler.apply(parall, [parall, index].concat(args));
             });
 
             return parall;
@@ -117,11 +178,11 @@ var util = {
             obj.forEach(iterator);
         } else if (obj.length === +obj.length){
             for (var i = 0; i < obj.length; i++) {
-                iterator.call(context, obj[i], i);
+                if(iterator.call(context, obj[i], i)) break;
             }
         } else {
             for (var key in obj) {
-                iterator.call(context, obj[key], key);
+                if(stop = iterator.call(context, obj[key], key)) break;
             }
         }
     },
