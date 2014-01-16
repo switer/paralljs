@@ -6,7 +6,7 @@ Paralljs call each async function in parallel, let parallel async function callb
 ## Install
 
 ```bash
-npm install chainjs
+npm install paralljs
 ```
 
 ## Usage
@@ -41,4 +41,16 @@ Parall([
 })
 .start();
 
+```
+
+## API
+
+### Parall(beginHandlers, [param1], [param2], [paramN]);
+Instancing a parall intance and push parall functions with param which will be invoke when call parall.start() 
+```javascript
+Parall([
+    func1,
+    func2,
+    func3
+], param);
 ```

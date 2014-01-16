@@ -15,17 +15,19 @@ Parall([
     },
     // fetch from github.io
     function (parall, index) {
+        parall.data('params', {name:"switer"});
         console.log('parall id: ' + index); // 1
         setTimeout( function() {
             parall.state('isFromGithubIO', true);
+            // states well be never change
+            parall.end();
         }, 2000);
     },
     // fetch from github.com/switer
     function (parall, index) {
         console.log('parall id: ' + index); // 2
         parall.state('isFromGithubSwiter', true);
-        // states well be never change
-        parall.end();
+        
     }
 ], "switer")
 .parall(function (parall, index, param) {
@@ -46,6 +48,6 @@ Parall([
     console.log('isFromGithubSwiter', isFromGithubSwiter)
 })
 .final(function (parall) {
-    console.log('final')
+    console.log('final', parall.data())
 })
 .start();

@@ -22,6 +22,7 @@ function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
         globalStateListeners = [],
         beforeHandlers = [],
         doneHandlers = [],
+        _data = {},
         isStoping = false,
         states = {};
 
@@ -45,19 +46,12 @@ function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
      *  Parall instance
      **/
     var parall = {
-
+        
         /**
-         *  add a parall handler to parall array
+         *  Run before each parallel function
          **/
-        parall: function (parallHandler) {
-            var args = util.slice(arguments);
-            args.shift();
-
-            // with params
-            parallHandlers.push({
-                handler: parallHandler,
-                args: args
-            });
+        before: function (beforeHandler) {
+            beforeHandlers.push(beforeHandler);
             return parall;
         },
         /**
@@ -88,21 +82,46 @@ function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
 
         },
         /**
-         *  Run before each parallel function
-         **/
-        before: function (beforeHandler) {
-            beforeHandlers.push(beforeHandler);
-            return parall;
-        },
-        final: function (doneHandler) {
-            doneHandlers.push(doneHandler);
-            return parall;
+         *  Save data in current parall instance
+         */
+        data: function (key, data) {
+            // set data
+            if (key && data) {
+                _data[key] = data;
+                return parall;
+            }
+            // get data value by key
+            else if (key && !data) { 
+                return _data[key];
+            }
+            // return all data of currently parall
+            else {
+                return util.extend({}, _data);
+            }
         },
         end: function () {
             if (filter()) return;
             isStoping = true;
 
             util.batch(doneHandlers, parall);
+            return parall;
+        },
+        final: function (doneHandler) {
+            doneHandlers.push(doneHandler);
+            return parall;
+        },
+        /**
+         *  add a parall handler to parall array
+         **/
+        parall: function (parallHandler) {
+            var args = util.slice(arguments);
+            args.shift();
+
+            // with params
+            parallHandlers.push({
+                handler: parallHandler,
+                args: args
+            });
             return parall;
         },
         /**
