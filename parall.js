@@ -221,7 +221,6 @@ var util = {
                 }
             }
         });
-
         return obj;
     },
     /**
@@ -232,7 +231,6 @@ var util = {
         args.shift();
         util.each(handlers, function (handler) {
             if (handler) {
-                // util.invoke(handler, this, args);
                 handler.apply(this, args);
             }
         });
@@ -242,26 +240,6 @@ var util = {
      */
     slice: function (array) {
         return Array.prototype.slice.call(array);
-    },
-    /**
-     *  Function.bind
-     */
-    bind: function (context, func) {
-        return function () {
-            func.apply(context, arguments);
-        }
-    },
-    /**
-     *  function call simple encapsulation
-     */
-    invoke: function (handler, context) {
-        var args = this.slice(arguments);
-        args = args.pop();
-        try {
-            handler.apply(context, args);
-        } catch (e) {
-            
-        }
     },
     /**
      *  Get a object type
