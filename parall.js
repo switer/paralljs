@@ -10,10 +10,10 @@
 'use strict;'
 
 /**
- *  Parall enter funtion
- *  Create parall instance
+ *  Parall main funtion
+ *  Create a parall instance
  */
-function Parall (/*[parallFunc1, parallFunc2, ...., parallFuncN]*/) {
+function Parall (/*[func1, ...., funcN], [param1, ..., paramN]*/) {
 
     var args = util.slice(arguments),
         beginParallHandlers = args.shift(),
