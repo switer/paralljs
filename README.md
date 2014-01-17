@@ -76,6 +76,24 @@ Parall([function (parall) {
 });
 ```
 
+### .canoe(canoeName,  canoeFunc)
+function with the specified name which will not be called if canoneName is set by another, return function.
+```javascript
+Parall([
+    function (parall) {
+        setTimeout(parall.canoe('load', function () {
+            // will not be called, because "load" is override by "load 2"
+            console.log('-----------load 1');
+        }), 2000);
+    },
+    function (parall) {
+        setTimeout(parall.canoe('load', function () {
+            console.log('-----------load 2');
+        }), 500);
+    }
+]).start();
+```
+
 ### .data()
 Get/Set data in current parall instance
 ```javascript

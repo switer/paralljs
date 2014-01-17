@@ -56,6 +56,10 @@ function Parall (/*[func1, ...., funcN], [param1, ..., paramN]*/) {
             return parall;
         },
         /**
+         *  comment
+         **/
+        canoe: Parall.canoe,
+        /**
          *  state change listener
          **/
         change: function (/*[stateName], listener*/) {
@@ -264,6 +268,24 @@ var util = {
             type = type.substring(8, type.length - 1);
         }
         return type;
+    }
+}
+
+
+var  _canoes = {};
+/**
+ *  Static methoed
+ **/
+Parall.canoe = function (canoeName, canoeFunc) {
+    _canoes[canoeName] = _canoes[canoeName] || 0;
+
+    var curId = _canoes[canoeName];
+
+    _canoes[canoeName] ++;
+
+    return function () {
+        if ( curId + 1 !== _canoes[canoeName]) return;
+        canoeFunc.apply(this, arguments);
     }
 }
 
