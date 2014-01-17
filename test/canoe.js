@@ -12,12 +12,12 @@ Parall([
         }), 500);
     },
     function (parall) {
-        setTimeout(parall.canoe('load', function () {
+        setTimeout(Parall.canoe('load', function () {
             console.log('-----------load 3');
         }), 1000);
     },
     function (parall) {
-        setTimeout(parall.canoe('fetch', function () {
+        setTimeout(Parall.canoe('fetch', function () {
             console.log('-----------fetch 1');
         }), 1000);
     }
