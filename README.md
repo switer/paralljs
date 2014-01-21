@@ -88,7 +88,7 @@ Parall([
     },
     function (parall) {
         // Parall.canoe same as parall.canoe
-        setTimeout(Parall('load', function () {
+        setTimeout(Parall.canoe('load', function () {
             console.log('-----------load 2');
         }), 500);
     }

@@ -285,7 +285,7 @@ Parall.canoe = function (canoeName, canoeFunc) {
 
     return function () {
         if ( curId + 1 !== _canoes[canoeName]) return;
-        canoeFunc.apply(this, arguments);
+        _.type(canoeFunc == 'function') && canoeFunc.apply(this, arguments);
     }
 }
 
